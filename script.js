@@ -22,9 +22,6 @@ function addRow() {
   });
 }
 
-// Rest of the functions remain the same as in the previous response
-// ...
-
 function removeLastRow() {
   const tableBody = document.getElementById("table-body");
   const rows = tableBody.getElementsByTagName("tr");
@@ -46,21 +43,49 @@ function saveRowData(button) {
 }
 
 function moveCursor(event, rowIndex, cellIndex) {
-  if (event.key === "Enter") {
-    const tableBody = document.getElementById("table-body");
-    const rows = tableBody.getElementsByTagName("tr");
-    const currentInput = event.target;
-    const currentRow = rows[rowIndex];
-    const allInputs = currentRow.querySelectorAll("input");
+  const tableBody = document.getElementById("table-body");
+  const rows = tableBody.getElementsByTagName("tr");
+  const currentInput = event.target;
+  const currentRow = rows[rowIndex];
+  const allInputs = currentRow.querySelectorAll("input");
+  const totalInputs = allInputs.length;
 
-    // Calculate the index of the next input (adjacent cell)
-    const nextIndex = (cellIndex + 1) % allInputs.length;
+  // Function to move the cursor to the previous input cell
+  function moveToPreviousCell(index) {
+    if (index >= 0) {
+      const prevInput = allInputs[index];
+      prevInput.focus();
+    }
+  }
+
+  // Function to check if the input cell is empty or not
+  function isEmptyInput(input) {
+    return input.value.trim() === "";
+  }
+
+  // If the backspace key is pressed
+  if (event.key === "Backspace" && isEmptyInput(currentInput)) {
+    const currentIndex = Array.from(allInputs).indexOf(currentInput);
+
+    if (currentIndex === 0) {
+      // If the current input is the first one, move to the last input of the previous row
+      const prevRow = rows[rowIndex - 1];
+      if (prevRow) {
+        const prevRowInputs = prevRow.querySelectorAll("input");
+        moveToPreviousCell(prevRowInputs.length - 1);
+      }
+    } else {
+      // Move to the previous input in the same row
+      moveToPreviousCell(currentIndex - 1);
+    }
+  } else if (event.key === "Enter") {
+    const nextIndex = (cellIndex + 1) % totalInputs;
     const nextRow = rows[rowIndex + 1];
 
     if (nextIndex === 0 && nextRow) {
       // Move to the first input of the next row
-      const nextInput = nextRow.querySelectorAll("input")[0];
-      nextInput.focus();
+      const nextRowInputs = nextRow.querySelectorAll("input");
+      nextRowInputs[0].focus();
     } else {
       // Move to the next input in the same row
       const nextInput = allInputs[nextIndex];
