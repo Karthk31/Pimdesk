@@ -103,3 +103,45 @@ function enableRowEditing(button) {
   row.classList.add("editing");
   row.classList.remove("saved");
 }
+
+function generateTxtFile() {
+  const table = document.querySelector("table");
+  const columnHeaders = Array.from(table.querySelectorAll("thead th")).map(
+    (th) => th.innerText
+  );
+
+  const tableBody = document.getElementById("table-body");
+  const rows = tableBody.getElementsByTagName("tr");
+
+  let txtData = "";
+
+  // Add column headers
+  txtData += columnHeaders.join("\t") + "\n";
+
+  // Generate the table body rows
+  for (let i = 0; i < rows.length; i++) {
+    const currentRow = rows[i];
+    const cells = currentRow.querySelectorAll("td");
+
+    for (let j = 0; j < cells.length; j++) {
+      txtData += cells[j].querySelector("input").value + "\t";
+    }
+
+    txtData += "\n";
+  }
+
+  // Create a Blob with the data
+  const blob = new Blob([txtData], { type: "text/plain" });
+
+  // Create a temporary anchor element to trigger the download
+  const anchor = document.createElement("a");
+  anchor.href = URL.createObjectURL(blob);
+  anchor.download = "table_data.txt"; // Set the filename of the downloaded file
+
+  // Append the anchor to the body and click it to trigger the download
+  document.body.appendChild(anchor);
+  anchor.click();
+
+  // Clean up by removing the anchor after download
+  document.body.removeChild(anchor);
+}
